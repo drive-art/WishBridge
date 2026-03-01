@@ -1,0 +1,18 @@
+{
+  "project": "WishBridge",
+  "version": "0.1",
+  "master_node": "x3pro_noah",
+  "agents": [
+    {
+      "id": "noah_v30",
+      "name": "NOAH",
+      "device": "Xiaomi X3 Pro",
+      "status": "active",
+      "capabilities": ["chat", "status", "memory"],
+      "manifest_signed": true,
+      "joined": "2025-03-01"
+    }
+  ],
+  "intents": [],
+  "log": []
+}
