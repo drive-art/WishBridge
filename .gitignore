@@ -1,0 +1,18 @@
+# Secrets
+.wishbridge/
+secrets/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Runtime logs
+*.log
+backend/core/chain.json
+
+# OS
+.DS_Store
+
+# Termux temp
+~
