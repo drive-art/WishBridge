@@ -1,0 +1,23 @@
+{
+  "active_model": "/data/data/com.termux/files/home/.wishbridge/models/smollm2-1.7b-q4.gguf",
+  "draft_model": "",
+  "llm_port": 8080,
+  "api_port": 8082,
+  "network_port": 9090,
+  "llm_threads": 4,
+  "llm_ctx": 2048,
+  "ram_limit_mb": 4000,
+  "ram_low_mb": 300,
+  "thermal_limit": 68,
+  "battery_min": 20,
+  "device_name": "noah_honor90",
+  "device_role": "master",
+  "agent_name": "Noah",
+  "llm_engine": "llama",
+  "cactus_lib": "/data/data/com.termux/files/home/AI/libcactus.so",
+  "models": {
+    "light": "/data/data/com.termux/files/home/.wishbridge/models/smollm2-1.7b-q4.gguf",
+    "work": "/data/data/com.termux/files/home/.wishbridge/models/nanbeige4.1-3b-q4_k_m.gguf",
+    "power": "/data/data/com.termux/files/home/.wishbridge/models/qwen3.5-4b-q4.gguf"
+  }
+}

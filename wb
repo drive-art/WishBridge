@@ -1,0 +1,131 @@
+#!/data/data/com.termux/files/usr/bin/bash
+CFG="$HOME/.wishbridge/config.json"
+PORT=$(python3 -c "import json; print(json.load(open('$CFG')).get('llm_port',8080))" 2>/dev/null || echo 8080)
+case "$1" in
+  start)
+    echo '🚀 Запуск WishBridge...'
+    # Запускаем LLM из config.json
+    MODEL=$(python3 -c "import json; print(json.load(open('$HOME/.wishbridge/config.json')).get('active_model',''))" 2>/dev/null)
+    if ! curl -s http://127.0.0.1:$PORT/health > /dev/null 2>&1; then
+      echo "🌵 Cactus: qwen3-0.6b-int4"
+      nohup python3 ~/AI/cactus_bridge.py \
+        >> ~/WishBridge/logs/llm.log 2>&1 &
+      echo "LLM PID: $!"
+      sleep 8
+    else
+      echo '🌵 Cactus уже запущен'
+    fi
+    nohup python3 ~/agents/noah_os.py > ~/WishBridge/logs/noah_os.log 2>&1 &
+    echo "Noah PID: $!"
+    sleep 3 && tail -5 ~/WishBridge/logs/noah_os.log
+    ;;
+  stop)
+    pkill -f "noah_os.py" && echo "🛑 Noah остановлен" || echo "не запущен"
+    pkill -f "llama-server" 2>/dev/null || true
+    pkill -f "cactus_bridge.py" && echo "🛑 LLM остановлен" || true
+    ;;
+  status)
+    echo "📊 Noah Status"
+    curl -s "http://127.0.0.1:$PORT/health" > /dev/null && echo "LLM: ✅" || echo "LLM: ❌"
+    echo "RAM: $(awk '/MemAvailable/ {print int($2/1024)}' /proc/meminfo)MB available"
+    echo "Temp: $(($(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0)/1000))°C"
+    BAT=$(termux-battery-status 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(str(int(d['percentage']))+'% '+d['status'])" 2>/dev/null)
+    echo "Bat: ${BAT:-недоступно}"
+    pgrep -f "noah_os.py" > /dev/null && echo "Noah: ✅ запущен" || echo "Noah: ❌ не запущен"
+    ;;
+  logs)
+    tail -30 ~/WishBridge/logs/noah_os.log 2>/dev/null || echo "(нет логов)"
+    ;;
+  thermal)
+    for i in $(seq 0 5); do
+      T=$(cat /sys/class/thermal/thermal_zone${i}/temp 2>/dev/null) && echo "zone${i}: $((T/1000))°C"
+    done
+    ;;
+  model)
+    case "$2" in
+      light) M="smollm2-1.7b-q4.gguf" ;;
+      work)  M="nanbeige4.1-3b-q4_k_m.gguf" ;;
+      power) M="qwen3.5-4b-q4.gguf" ;;
+      *) echo "wb model light|work|power"; exit 1 ;;
+    esac
+    echo "🔄 Переключаю на $M..."
+    pkill -f "llama-server" || true
+    sleep 2
+    nohup ~/llama.cpp/build/bin/llama-server \
+      --model ~/.wishbridge/models/$M \
+      --host 127.0.0.1 --port $PORT \
+      --threads 4 --ctx-size 512 -ngl 0 \
+      --temp 0.7 --repeat-penalty 1.1 \
+      >> ~/WishBridge/logs/llm.log 2>&1 &
+    echo "LLM PID: $!"
+    sleep 8 && curl -s http://127.0.0.1:$PORT/health
+    ;;
+  mem|memory)
+    python3 ~/wb_memory.py show
+    ;;
+  ma|mem-add)
+    shift
+    python3 ~/wb_memory.py add "$*"
+    ;;
+  ses|session)
+    cat ~/.wishbridge/session.md
+    ;;
+  ses-edit|se)
+    nano ~/.wishbridge/session.md
+    ;;
+  ses-add|sa)
+    echo "$(date '+%Y-%m-%d %H:%M') — $2" >> ~/.wishbridge/session.md
+    echo "✅ добавлено в память"
+    ;;
+  mon)
+    tmux kill-session -t wbmon 2>/dev/null || true
+    tmux new-session -s wbmon ~/scans/monitor.sh
+    ;;
+  mon-stop)
+    tmux kill-session -t monitor 2>/dev/null && echo "Monitor остановлен" || echo "не запущен"
+    ;;
+  sc)
+    case "$2" in
+      sys)  ~/scans/scan_system.sh ;;
+      ag)   ~/scans/scan_agents.sh ;;
+      mod)  ~/scans/scan_models.sh ;;
+      proc) ~/scans/scan_processes.sh ;;
+      dup)  ~/scans/scan_duplicates.sh ;;
+      mg)   ~/scans/scan_morning.sh ;;
+      doctor) ~/scans/doctor.sh ;;
+      run) ~/scans/run_sandbox.sh ;;
+      doc) ~/scans/doctor.sh ;;
+      *)    echo "wb sc: sys | ag | mod | proc | dup" ;;
+    esac
+    ;;
+  scan)
+    ~/scans/full_scan.sh
+    ;;
+  doctor|doc)
+    ~/scans/doctor.sh
+    ;;
+  run)
+    ~/scans/run_sandbox.sh
+    ;;
+  monster)
+    python3 ~/wb_monster_scan.py
+    ;;
+  dashboard)
+    python3 ~/AI/wb_dashboard.py
+    ;;
+  *)
+    echo ""
+    echo "NoahOS | wb <команда>"
+    echo "  start              — запустить Noah"
+    echo "  stop               — остановить"
+    echo "  status             — состояние"
+    echo "  logs               — логи"
+    echo "  thermal            — температура"
+    echo "  scan               — обзор"
+    echo "  model light|work|power — переключить модель"
+    echo "  sc sys|ag|mod|proc|dup — сканы системы"
+  echo "  ses              — память проекта"
+  echo "  sa \"текст\"     — добавить заметку в память"
+    echo ""
+    ;;
+esac

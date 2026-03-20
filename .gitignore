@@ -1,0 +1,10 @@
+logs/
+sandbox/
+run/
+*.gguf
+*.so
+*.zip
+__pycache__/
+*.pyc
+wb_memory.json
+wb_memory_snapshot.txt
