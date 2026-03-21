@@ -41,6 +41,7 @@ if not handle:
 print(f"✅ Модель загружена!")
 
 lock = threading.Lock()
+active_requests = 0
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
