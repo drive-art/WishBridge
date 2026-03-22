@@ -15,26 +15,26 @@ case "$1" in
     else
       echo '🌵 Cactus уже запущен'
     fi
-    nohup python3 ~/agents/noah_os.py > ~/WishBridge/logs/noah_os.log 2>&1 &
-    echo "Noah PID: $!"
-    sleep 3 && tail -5 ~/WishBridge/logs/noah_os.log
+    nohup python3 ~/WishBridge/aios_agent.py > ~/WishBridge/logs/aios.log 2>&1 &
+    echo "Atlas PID: $!"
+    sleep 3 && tail -5 ~/WishBridge/logs/aios.log
     ;;
   stop)
-    pkill -f "noah_os.py" && echo "🛑 Noah остановлен" || echo "не запущен"
+    pkill -f "aios_agent.py" && echo "🛑 Atlas остановлен" || echo "не запущен"
     pkill -f "llama-server" 2>/dev/null || true
     pkill -f "cactus_bridge.py" && echo "🛑 LLM остановлен" || true
     ;;
   status)
-    echo "📊 Noah Status"
+    echo "📊 AIOS WishBridge Status"
     curl -s "http://127.0.0.1:$PORT/health" > /dev/null && echo "LLM: ✅" || echo "LLM: ❌"
     echo "RAM: $(awk '/MemAvailable/ {print int($2/1024)}' /proc/meminfo)MB available"
     echo "Temp: $(($(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null || echo 0)/1000))°C"
     BAT=$(termux-battery-status 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(str(int(d['percentage']))+'% '+d['status'])" 2>/dev/null)
     echo "Bat: ${BAT:-недоступно}"
-    pgrep -f "noah_os.py" > /dev/null && echo "Noah: ✅ запущен" || echo "Noah: ❌ не запущен"
+    pgrep -f "aios_agent.py" > /dev/null && echo "Atlas: ✅ запущен" || echo "Atlas: ❌ не запущен"
     ;;
   logs)
-    tail -30 ~/WishBridge/logs/noah_os.log 2>/dev/null || echo "(нет логов)"
+    tail -30 ~/WishBridge/logs/aios.log 2>/dev/null || echo "(нет логов)"
     ;;
   thermal)
     for i in $(seq 0 5); do
@@ -113,10 +113,17 @@ case "$1" in
   dashboard)
     python3 ~/AI/wb_dashboard.py
     ;;
+  cluster)
+    echo "🌐 Запуск кластера..."
+    python3 ~/AI/auto_discover.py
+    pkill -f master_router.py 2>/dev/null
+    nohup python3 ~/AI/master_router.py > ~/WishBridge/logs/router.log 2>&1 &
+    echo "Router PID: $!"
+    ;;
   *)
     echo ""
-    echo "NoahOS | wb <команда>"
-    echo "  start              — запустить Noah"
+    echo "AIOS WishBridge | wb <команда>"
+    echo "  start              — запустить Atlas"
     echo "  stop               — остановить"
     echo "  status             — состояние"
     echo "  logs               — логи"
