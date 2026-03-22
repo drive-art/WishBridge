@@ -280,10 +280,21 @@ def cleanup_sandbox():
     except Exception as e:
         log(f"sandbox cleanup: {e}", "WARN")
 
+def cleanup_sandbox():
+    try:
+        now = __import__("time").time()
+        for f in SANDBOX_DIR.glob("*.py"):
+            if now - f.stat().st_mtime > 86400:
+                f.unlink()
+        log("Sandbox очищен", "INFO")
+    except Exception as e:
+        log(f"sandbox cleanup: {e}", "WARN")
+
 def anchor_loop():
     while not STOP_EVENT.is_set():
         time.sleep(900)
         create_anchor()
+        cleanup_sandbox()
         cleanup_sandbox()
 
 # ── ПЛАНИРОВЩИК ────────────────────────────────────────
