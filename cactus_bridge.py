@@ -20,7 +20,7 @@ def get_system_info():
     except: return "?", "?"
 
 LIB_PATH = str(Path.home() / "AI/libcactus_android.so")
-MODEL_PATH = str(Path.home() / "AI/cactus-models/qwen3-0.6b-int4")
+MODEL_PATH = str(Path.home() / "AI/cactus-models/qwen3-0.6b-int8")
 
 lib = ctypes.CDLL(LIB_PATH)
 lib.cactus_init.restype = ctypes.c_void_p
@@ -64,7 +64,7 @@ class Handler(BaseHTTPRequestHandler):
             # Добавляем /no_think если нет системного промпта
             has_system = any(m.get("role") == "system" for m in messages)
             if not has_system:
-                messages = [{"role": "system", "content": "Ты Noah — AI агент WishBridge. Отвечай ТОЛЬКО по-русски. Кратко. /no_think"}] + messages
+                messages = [{"role": "system", "content": "You are Noah, WishBridge AI agent. Always respond in Russian language only. Be brief. /no_think"}] + messages
             max_tokens = body.get("max_tokens", 512)
 
             options = json.dumps({"max_tokens": max_tokens})
