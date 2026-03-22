@@ -64,7 +64,7 @@ class Handler(BaseHTTPRequestHandler):
             # Добавляем /no_think если нет системного промпта
             has_system = any(m.get("role") == "system" for m in messages)
             if not has_system:
-                messages = [{"role": "system", "content": "/no_think"}] + messages
+                messages = [{"role": "system", "content": "Ты Noah — AI агент WishBridge. Отвечай ТОЛЬКО по-русски. Кратко. /no_think"}] + messages
             max_tokens = body.get("max_tokens", 512)
 
             options = json.dumps({"max_tokens": max_tokens})
@@ -96,7 +96,7 @@ class Handler(BaseHTTPRequestHandler):
                 "usage": {"completion_tokens": max_tokens, "prompt_tokens": 0, "total_tokens": max_tokens},
                 "decode_tps": tps
             }
-            data = json.dumps(result).encode()
+            data = json.dumps(result, ensure_ascii=False).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", len(data))

@@ -24,3 +24,10 @@ wb scan — full system scan
 wb mem — show 7-day memory
 wb cluster — start cluster mode
 wb dashboard — cluster dashboard
+
+## Модели для Cactus
+
+| Модель | Телефон | Ссылка |
+|--------|---------|--------|
+| Qwen3-0.6B INT4 | X3 Pro (6GB) | https://huggingface.co/Cactus-Compute/Qwen3-0.6B/resolve/main/weights/qwen3-0.6b-int4.zip |
+| Qwen3-1.7B INT4 | Honor 90 (12GB) | https://huggingface.co/Cactus-Compute/Qwen3-1.7B/resolve/main/weights/qwen3-1.7b-int4.zip |
