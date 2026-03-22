@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>AIOS Dashboard</title>
+<style>body{margin:0;font-family:Arial;background:#0f1117;color:#e6edf3}.container{max-width:900px;margin:40px auto;padding:20px}h1{text-align:center;color:#58a6ff}.card{background:#161b22;border-radius:12px;padding:20px;margin-bottom:20px}.row{display:flex;justify-content:space-between;margin:8px 0}.label{color:#8b949e}.value{font-weight:bold;color:#58a6ff}ul{list-style:none;padding:0}li{padding:6px 0;border-bottom:1px solid #30363d}</style>
+</head><body><div class="container"><h1>🤖 AIOS WishBridge</h1>
+<div class="card"><h2>Статус агента</h2>
+<div class="row"><span class="label">Имя:</span><span class="value" id="agent">...</span></div>
+<div class="row"><span class="label">Роль:</span><span class="value" id="role">...</span></div>
+<div class="row"><span class="label">RAM (MB):</span><span class="value" id="ram">...</span></div>
+<div class="row"><span class="label">Uptime (сек):</span><span class="value" id="uptime">...</span></div>
+<div class="row"><span class="label">Peers:</span><span class="value" id="peers">...</span></div>
+</div>
+<div class="card"><h2>Агенты кластера</h2><ul id="agentsList"></ul></div>
+</div>
+<script>
+async function update(){
+  try{const r=await fetch("http://127.0.0.1:8082/status");const d=await r.json();
+  document.getElementById("agent").textContent=d.agent;
+  document.getElementById("role").textContent=d.cluster_role;
+  document.getElementById("ram").textContent=d.ram_free_mb;
+  document.getElementById("uptime").textContent=d.uptime_sec+"s";
+  document.getElementById("peers").textContent=d.peers_count;}catch(e){}
+  try{const r=await fetch("http://127.0.0.1:8082/agents");const d=await r.json();
+  const l=document.getElementById("agentsList");l.innerHTML="";
+  d.forEach(n=>{const li=document.createElement("li");li.textContent="🤖 "+n;l.appendChild(li);});}catch(e){}
+}
+setInterval(update,3000);update();
+</script></body></html>
