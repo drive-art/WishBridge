@@ -134,7 +134,7 @@ def cmd_show():
         "║     📋 WishBridge Memory — 7 дней        ║",
         "╚══════════════════════════════════════════╝",
         f"Снимок: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-        f"Устройство: Honor 90 | Noah AI-OS",
+        f"Устройство: Poco X3 Pro | Noah Worker",
         "",
     ]
     if not data["days"]:
