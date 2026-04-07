@@ -1,3 +1,4 @@
+*.weights
+*.gguf
+*.bin
 engines/cactus/libcactus.so
-AI/cactus-models/lfm2-8b/*.weights
-AI/cactus-models/lfm2-2.6b/*.weights
