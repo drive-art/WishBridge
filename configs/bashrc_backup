@@ -1,0 +1,22 @@
+# ╔══════════════════════════════════════════════╗
+# ║        WISHBRIDGE COMMAND SHORTCUTS          ║
+# ╚══════════════════════════════════════════════╝
+
+# Morning Check
+alias mor='~/wb_morning_check.sh'
+alias m='~/wb_morning_check.sh'        # ультра-короткая версия
+
+# WishBridge Doctor
+alias doc='~/wishbridge_doctor.sh'
+
+# Semantic Memory v2.0
+alias mem='python3 ~/wb_memory.py'
+
+# Semantic Memory v3.5 (идеальная)
+alias mem3="python3 ~/wb_memory_v35.py"
+
+# Быстрое обновление WishBridge
+alias wb_update='cd ~/WishBridge && git pull origin main && cd ~'
+
+# Перезагрузить bashrc
+alias reload='source ~/.bashrc'
